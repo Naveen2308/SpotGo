@@ -33,6 +33,22 @@ export default function RootLayout() {
                 <Stack.Screen name="index" />
                 <Stack.Screen name="auth" />
                 <Stack.Screen name="(app)" />
+                <Stack.Screen
+                    name="legal/terms"
+                    options={{
+                        presentation: 'transparentModal',
+                        animation: 'fade',
+                        headerShown: false
+                    }}
+                />
+                <Stack.Screen
+                    name="legal/privacy"
+                    options={{
+                        presentation: 'transparentModal',
+                        animation: 'fade',
+                        headerShown: false
+                    }}
+                />
             </Stack>
         </View>
     );

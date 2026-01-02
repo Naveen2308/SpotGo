@@ -7,6 +7,7 @@ import { Button } from '../../components/atoms/Button';
 import { OTPInput } from '../../components/molecules/OTPInput';
 import { Colors } from '../../constants/Colors';
 import { UserService } from '../../services/api';
+import { Logo } from '../../components/atoms/Logo';
 
 export default function VerificationScreen() {
     const params = useLocalSearchParams();
@@ -39,15 +40,17 @@ export default function VerificationScreen() {
     };
 
     return (
-        <Container safe padded>
-            <View style={styles.header}>
+        <Container safe padded style={{ backgroundColor: Colors.backgroundLight, flex: 1, justifyContent: 'center' }}>
+            {/* <Logo /> */}
+
+            <View style={styles.container}>
                 <Typography variant="h1">Verify Phone</Typography>
-                <Typography variant="body" color={Colors.textSecondary}>
+                <Typography variant="p" color={Colors.textSecondary}>
                     Code sent to {phone || 'your number'}
                 </Typography>
             </View>
 
-            <View style={styles.content}>
+            <View style={styles.form}>
                 <OTPInput
                     length={6}
                     onComplete={(c) => setCode(c)}
@@ -61,8 +64,8 @@ export default function VerificationScreen() {
                     style={styles.button}
                 />
 
-                <Typography variant="caption" centered style={styles.resend}>
-                    Didn't receive code? <Typography variant="caption" color={Colors.primary}>Resend</Typography>
+                <Typography variant="p" centered style={styles.resend}>
+                    Didn't receive code? <Typography variant="p" color={Colors.primary}>Resend</Typography>
                 </Typography>
             </View>
         </Container>
@@ -70,12 +73,14 @@ export default function VerificationScreen() {
 }
 
 const styles = StyleSheet.create({
-    header: {
-        marginTop: 40,
-        marginBottom: 40,
+    container: {
+        alignItems: 'center',
+        marginBottom: 30,
+        marginTop: 0,
     },
-    content: {
-        flex: 1,
+    form: {
+        paddingHorizontal: 20,
+        width: '100%',
     },
     button: {
         marginTop: 40,

@@ -3,24 +3,18 @@ import { View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
 import { router } from 'expo-router';
 import { Container } from '../../components/atoms/Container';
 import { Typography } from '../../components/atoms/Typography';
-import { Input } from '../../components/atoms/Input';
 import { Button } from '../../components/atoms/Button';
 import { Colors } from '../../constants/Colors';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Logo } from '../../components/atoms/Logo';
-import CountryPicker, { Country, CountryCode } from 'react-native-country-picker-modal';
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/bootstrap.css";
 
 
 export default function SignInScreen() {
-    const [phone, setPhone] = useState('');
+    const [phone, setPhone] = useState('+91');
     const [loading, setLoading] = useState(false);
-    const [countryCode, setCountryCode] = useState<CountryCode>('IN');
-    const [callingCode, setCallingCode] = useState('91');
 
-    const onSelectCountry = (country: Country) => {
-        setCountryCode(country.cca2);
-        setCallingCode(country.callingCode[0]);
-    };
 
     const handlePhoneLogin = async () => {
         if (phone.length < 10) return;
@@ -43,35 +37,50 @@ export default function SignInScreen() {
             <View style={styles.container}>
                 <Typography variant="h1">Welcome Back</Typography>
                 <Typography variant="p" color={Colors.textSecondary}>
-                    Sign in to continue your journey
+                    watch ads, save fares.
                 </Typography>
             </View>
 
             <View style={styles.form}>
-                <View style={styles.mobileNumberContainer}>
-                    <View style={styles.countryPickerWrapper}>
-                        <Typography variant="caption" style={styles.label}>Code</Typography>
-                        <View style={styles.countryPickerInput}>
-                            <CountryPicker
-                                countryCode={countryCode}
-                                withFilter
-                                withFlag
-                                withCallingCodeButton
-                                withAlphaFilter
-                                withCallingCode
-                                onSelect={onSelectCountry}
-                                containerButtonStyle={styles.countryPickerButton}
-                            />
-                            <Typography variant="body" style={{ marginLeft: 4 }}>+{callingCode}</Typography>
-                        </View>
-                    </View>
-                    <Input
-                        label="Mobile Number"
-                        placeholder="1234567890"
+
+                <View style={{ marginBottom: 20, width: '100%', zIndex: 1000 }}>
+                    <Typography variant="p" style={{ marginBottom: 8, color: Colors.textSecondary }}>
+                        Mobile Number
+                    </Typography>
+
+                    <PhoneInput
+                        country={'in'}
+
+                        enableSearch={false}
                         value={phone}
-                        onChangeText={setPhone}
-                        keyboardType="phone-pad"
-                        containerStyle={{ flex: 1, marginBottom: 0 }}
+                        onChange={(phone) => setPhone(phone)}
+                        containerStyle={{
+                            width: '100%',
+                            height: 50,
+                            borderRadius: 8,
+                        }}
+                        inputStyle={{
+                            width: '100%',
+                            height: '100%',
+                            fontSize: 16,
+                            paddingLeft: 48,
+                            backgroundColor: Colors.surface,
+                            borderWidth: 1,
+                            borderColor: '#e5e5e5',
+                            color: Colors.text || '#000',
+                            borderRadius: 8,
+                        }}
+                        buttonStyle={{
+                            backgroundColor: 'transparent',
+                            borderWidth: 0,
+                            borderRightWidth: 1,
+                            borderRightColor: '#e5e5e5',
+                            borderTopLeftRadius: 8,
+                            borderBottomLeftRadius: 8,
+                        }}
+                        dropdownStyle={{
+                            width: '300px',
+                        }}
                     />
                 </View>
 
@@ -95,10 +104,10 @@ export default function SignInScreen() {
             </View>
 
             <View style={styles.footer}>
-                <Typography variant="caption" centered>
+                <Typography variant="p" centered>
                     Don't have an account?{' '}
                     <Typography
-                        variant="caption"
+                        variant="p"
                         color={Colors.primary}
                         onPress={() => router.push('/auth/sign-up')}
                     >
@@ -112,54 +121,20 @@ export default function SignInScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: Colors.backgroundLight,
         alignItems: 'center',
-        overflow: 'hidden',
-    },
-    header: {
-        marginTop: 40,
-        marginBottom: 40,
+        marginBottom: 10,
+        marginTop: 0,
     },
     form: {
-        flex: 1,
+        paddingRight: 30,
+        paddingLeft: 30,
+        paddingTop: 20,
     },
-    mobileNumberContainer: {
-        flexDirection: 'row',
-        alignItems: 'flex-end', // Align inputs at the bottom so labels align at top if heights match, or better: align bottom of containers? 
-        // Actually Input has label inside container. 
-        // Let's use 'flex-start' or default.
-        gap: 10,
-        marginBottom: 16,
-    },
-    countryPickerWrapper: {
-        width: 100,
-        marginBottom: 0,
-    },
-    label: {
-        marginBottom: 6,
-        color: Colors.textSecondary,
-    },
-    countryPickerInput: {
-        backgroundColor: Colors.surface,
-        borderRadius: 8,
-        paddingHorizontal: 12, // Slightly less than Input's 16
-        paddingVertical: 12,
-        // height: 48, // approximate height of Input 
-        // Input has vertical padding 12, fontSize 16. ~24+24 = 48? 
-        // Actually line height might vary. Let's trust padding.
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'transparent',
-    },
-    countryPickerButton: {
-        // any specific overrides for the picker touchable
-    },
+
     divider: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 24,
+        marginVertical: 6,
     },
     line: {
         flex: 1,
@@ -170,6 +145,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
     },
     footer: {
+        marginBottom: 20,
         paddingVertical: 20,
+        zIndex: -9,
     },
 });
