@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "621911695496",
+    "project_id": "spotgo-38679",
+    "storage_bucket": "spotgo-38679.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:621911695496:android:2b450405757e02fd473f3d",
+        "android_client_info": {
+          "package_name": "com.spotgo.spotgo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3LndIDkABnID_vYQvkmPvJPn-kqmZ5Dc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
-import { router } from 'expo-router';
+import { router, Stack, useNavigation } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { Logo } from '../components/atoms/Logo';
@@ -8,14 +8,12 @@ import { Colors } from '../constants/Colors';
 
 const { width, height } = Dimensions.get('window');
 
-
-
-// Use dark mode by default for the "feel" requested, or switch based on system
-const THEME = 'light';
-const BG_COLOR = THEME === 'dark' ? Colors.backgroundDark : Colors.backgroundLight;
-const TEXT_COLOR = THEME === 'dark' ? Colors.textDark : Colors.textLight;
+const THEME: 'light' | 'dark' = 'light';
+const BG_COLOR = (THEME as string) === 'dark' ? Colors.backgroundDark : Colors.backgroundLight;
+const TEXT_COLOR = (THEME as string) === 'dark' ? Colors.textDark : Colors.textLight;
 
 export default function SplashScreen() {
+    const navigation = useNavigation();
     // Animations
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -46,7 +44,11 @@ export default function SplashScreen() {
         }).start(() => {
             // 3. Navigate after loading
             setTimeout(() => {
-                router.replace('/auth/sign-in');
+                // Use stack navigation reset to clear history (Splash should not be reachable via back)
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'auth' as never }],
+                });
             }, 200);
         });
     }, []);
@@ -58,7 +60,8 @@ export default function SplashScreen() {
 
     return (
         <View style={styles.container}>
-            <StatusBar style={THEME === 'dark' ? 'light' : 'dark'} />
+            <Stack.Screen options={{ headerShown: false }} />
+            <StatusBar style={THEME === 'dark' ? 'light' : 'dark'} translucent backgroundColor="transparent" />
 
             {/* Background Blobs (simulated with gradients) */}
             <View style={[styles.blob, styles.blobTop]} />
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
     progressContainer: {
         width: '100%',
         height: 6,
-        backgroundColor: THEME === 'dark' ? '#1e293b' : '#e2e8f0', // slate-800 / slate-200
+        backgroundColor: (THEME as string) === 'dark' ? '#1e293b' : '#e2e8f0', // slate-800 / slate-200
         borderRadius: 3,
         overflow: 'hidden',
         marginBottom: 12,

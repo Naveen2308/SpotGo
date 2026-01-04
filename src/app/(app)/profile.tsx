@@ -1,15 +1,21 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { Container } from '../../components/atoms/Container';
 import { Typography } from '../../components/atoms/Typography';
 import { Button } from '../../components/atoms/Button';
 import { Colors } from '../../constants/Colors';
 
 export default function ProfileScreen() {
+    const navigation = useNavigation();
+
     const handleLogout = () => {
         // TODO: Implement logout
-        router.replace('/auth/sign-in');
+        // Use stack navigation reset to clear history
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'auth' as never }],
+        });
     };
 
     return (

@@ -36,7 +36,7 @@ export const OTPInput: React.FC<OTPInputProps> = ({ length = 6, onComplete }) =>
             {code.map((digit, index) => (
                 <TextInput
                     key={index}
-                    ref={ref => inputs.current[index] = ref}
+                    ref={ref => { if (inputs.current) inputs.current[index] = ref; }}
                     style={[styles.input, digit ? styles.filled : null]}
                     keyboardType="number-pad"
                     maxLength={1}

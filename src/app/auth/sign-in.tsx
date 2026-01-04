@@ -1,33 +1,75 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
+import { View, StyleSheet, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { Container } from '../../components/atoms/Container';
 import { Typography } from '../../components/atoms/Typography';
 import { Button } from '../../components/atoms/Button';
 import { Colors } from '../../constants/Colors';
-import { MaterialIcons } from '@expo/vector-icons';
 import { Logo } from '../../components/atoms/Logo';
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/bootstrap.css";
-
+import * as Location from 'expo-location';
+import auth from '@react-native-firebase/auth';
+import { AuthStore } from '../../services/authStore';
 
 export default function SignInScreen() {
-    const [phone, setPhone] = useState('+91');
+    const [countryCode, setCountryCode] = useState('in');
+    const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
+    React.useEffect(() => {
+        (async () => {
+            try {
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    return;
+                }
+
+                let location = await Location.getCurrentPositionAsync({});
+                let reverseGeocode = await Location.reverseGeocodeAsync({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude
+                });
+
+                if (reverseGeocode && reverseGeocode.length > 0) {
+                    const country = reverseGeocode[0].isoCountryCode?.toLowerCase();
+                    if (country) {
+                        setCountryCode(country);
+                        setPhone('');
+                    }
+                }
+            } catch (e) {
+                console.log("Location error", e);
+            }
+        })();
+    }, []);
 
     const handlePhoneLogin = async () => {
-        if (phone.length < 10) return;
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-            router.push({ pathname: '/auth/verification', params: { phone } });
-        }, 1000);
-    };
+        setError('');
+        if (!phone || phone.length < 5) {
+            setError('Please enter a valid mobile number');
+            return;
+        }
 
-    const handleGoogleLogin = () => {
-        console.log('Google Sign-In');
-        router.replace('/(app)/home');
+        setLoading(true);
+        try {
+            // Format phone number (ensure + prefix)
+            // Hardcoding +91 for now as per the UI replacement
+            const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
+            console.log('Phone number: ', formattedPhone);
+
+            const confirmationResult = await auth().signInWithPhoneNumber(formattedPhone);
+            console.log('Confirmation result: ', confirmationResult);
+
+            AuthStore.setConfirmationResult(confirmationResult);
+
+            setLoading(false);
+            router.push({ pathname: '/auth/verification', params: { phone: formattedPhone } });
+
+        } catch (err: any) {
+            setLoading(false);
+            console.error(err);
+            setError(err.message || 'Failed to send verification code.');
+        }
     };
 
     return (
@@ -48,40 +90,43 @@ export default function SignInScreen() {
                         Mobile Number
                     </Typography>
 
-                    <PhoneInput
-                        country={'in'}
-
-                        enableSearch={false}
-                        value={phone}
-                        onChange={(phone) => setPhone(phone)}
-                        containerStyle={{
-                            width: '100%',
-                            height: 50,
-                            borderRadius: 8,
-                        }}
-                        inputStyle={{
-                            width: '100%',
-                            height: '100%',
-                            fontSize: 16,
-                            paddingLeft: 48,
-                            backgroundColor: Colors.surface,
-                            borderWidth: 1,
-                            borderColor: '#e5e5e5',
-                            color: Colors.text || '#000',
-                            borderRadius: 8,
-                        }}
-                        buttonStyle={{
-                            backgroundColor: 'transparent',
-                            borderWidth: 0,
-                            borderRightWidth: 1,
-                            borderRightColor: '#e5e5e5',
-                            borderTopLeftRadius: 8,
-                            borderBottomLeftRadius: 8,
-                        }}
-                        dropdownStyle={{
-                            width: '300px',
-                        }}
-                    />
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: 50,
+                        backgroundColor: Colors.surface,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: error ? Colors.error : '#bdbdbd',
+                        paddingHorizontal: 12,
+                    }}>
+                        <Typography variant="p" style={{ marginRight: 8, color: Colors.text }}>
+                            +91
+                        </Typography>
+                        <View style={{ width: 1, height: '60%', backgroundColor: '#bdbdbd', marginRight: 12 }} />
+                        <TextInput
+                            style={{
+                                flex: 1,
+                                height: '100%',
+                                fontSize: 16,
+                                color: Colors.text || '#000',
+                            }}
+                            placeholder="Phone Number"
+                            placeholderTextColor={Colors.textSecondary}
+                            keyboardType="phone-pad"
+                            value={phone}
+                            onChangeText={(text) => {
+                                setPhone(text);
+                                if (error) setError('');
+                            }}
+                        />
+                    </View>
+                    {error ? (
+                        <Typography variant="caption" color={Colors.error} style={{ marginTop: 4 }}>
+                            {error}
+                        </Typography>
+                    ) : null}
                 </View>
 
                 <Button
@@ -90,17 +135,6 @@ export default function SignInScreen() {
                     loading={loading}
                 />
 
-                <View style={styles.divider}>
-                    <View style={styles.line} />
-                    <Typography variant="caption" style={styles.orText}>OR</Typography>
-                    <View style={styles.line} />
-                </View>
-
-                <Button
-                    title="Continue with Google"
-                    variant="outline"
-                    onPress={handleGoogleLogin}
-                />
             </View>
 
             <View style={styles.footer}>
@@ -129,20 +163,6 @@ const styles = StyleSheet.create({
         paddingRight: 30,
         paddingLeft: 30,
         paddingTop: 20,
-    },
-
-    divider: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 6,
-    },
-    line: {
-        flex: 1,
-        height: 1,
-        backgroundColor: Colors.darkGray,
-    },
-    orText: {
-        marginHorizontal: 16,
     },
     footer: {
         marginBottom: 20,

@@ -4,8 +4,8 @@ import { Colors } from '../../constants/Colors';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const THEME: 'light' | 'dark' = 'light';
-const BG_COLOR = THEME === 'dark' ? Colors.backgroundDark : Colors.backgroundLight;
-const TEXT_COLOR = THEME === 'dark' ? Colors.textDark : Colors.textLight;
+const BG_COLOR = (THEME as string) === 'dark' ? Colors.backgroundDark : Colors.backgroundLight;
+const TEXT_COLOR = (THEME as string) === 'dark' ? Colors.textDark : Colors.textLight;
 
 
 export const Logo = () => {
@@ -41,12 +41,12 @@ const styles = StyleSheet.create({
     logoCard: {
         width: 90,
         height: 90,
-        backgroundColor: THEME === 'dark' ? '#1a2332' : '#FFFFFF',
+        backgroundColor: (THEME as string) === 'dark' ? '#1a2332' : '#FFFFFF',
         borderRadius: 32,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: THEME === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+        borderColor: (THEME as string) === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
